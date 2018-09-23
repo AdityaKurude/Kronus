@@ -14,6 +14,11 @@ import pickle
 
 def generate_fake_news(path):
 
+    def manhattanToIndex(l):
+        for i in len(l):
+            if l[i] == 1:
+                return i;
+
     # #read data, remove non-alphanumeric chars and convert to lowercase
     # text = open(path).read()
     # print('corpus length:', len(text))
@@ -70,7 +75,11 @@ def generate_fake_news(path):
     for i in range(len_split_indices):
         input_model[i][split_indices] = True
 
-    pred = model.predict(input_model)
+    pred_manhatan = model.predict(input_model)
+    pred_word = split_input[manhattanToIndex(pred_manhatan)]
+
+    # Printing Prediction word for the input
+    print(pred_word)
 
 generate_fake_news('/Users/PedroFigueiredo/Desktop/test.txt')
 
