@@ -1,14 +1,7 @@
 from __future__ import print_function
-from keras.models import Sequential
-from keras.layers import Dense, Activation
-from keras.layers import LSTM
-from keras.optimizers import RMSprop
-from keras.utils.data_utils import get_file
 from keras.models import load_model
 
 import numpy as np
-import random
-import sys
 import re
 import pickle
 
@@ -27,7 +20,7 @@ def generate_fake_news(path):
     split_input = [s for s in split_input if len(s) >= 1]
     split_indices = [word_indices[s] for s in split_input]
 
-    model = load_model('Kronos_V0.h5')
+
     len_split_indices = len(split_indices) if len(split_indices) < n else n
 
     input_manhattan = np.zeros((len_split_indices, n), np.bool)
@@ -40,6 +33,7 @@ def generate_fake_news(path):
     if len_split_indices < n:
         input_manhattan = np.concatenate(np.zeros((n - len_split_indices, n), np.bool), input_manhattan)
 
+    model = load_model('Kronos_V0.h5')
     pred_manhattan = model.predict(input_manhattan)
     pred_word = split_input[manhattan_to_index(pred_manhattan)]
 
