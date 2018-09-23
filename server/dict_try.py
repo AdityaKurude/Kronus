@@ -1,23 +1,31 @@
-from __future__ import print_function
-from keras.models import Sequential
-from keras.layers import Dense, Activation
-from keras.layers import LSTM
-from keras.optimizers import RMSprop
-from keras.utils.data_utils import get_file
-from keras.models import load_model
-
+import glob, os
+import re
 import numpy as np
 import random
 import sys
-import re
-import pickle
 
-my_dict = {"test": 1, "testing": 2}
+BASE_PATH = "/home/ad/Kaggle/CodingAssistant/Kronus/server/TestDir/"
 
-f = open("file.pkl","wb")
-pickle.dump(my_dict,f)
-f.close()
+os.chdir(BASE_PATH)
 
-dict_ad = pickle.load( open( "file.pkl", "rb" ) )
+words = []
 
-print(dict_ad['test'], dict_ad['testing'])
+for file in glob.glob("*.py"):
+
+    text = open( BASE_PATH+file, 'r').read()
+
+    #TODO: remove all comments from the training data
+    text = re.sub("[\n]", ' ', text)
+
+    #associate words with numbers
+    split_data = re.split(' ', text)
+    split_data = [s for s in split_data if len(s) >= 1]
+
+    #remove duplicate words in same file
+    new_words = list(set(split_data))
+    words.extend(new_words)
+
+#remove duplicate words in all global database
+unique_words = list(set(words))
+unique_words.sort()
+print(unique_words)
