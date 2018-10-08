@@ -11,9 +11,16 @@ serializer = struct.Struct('I ' + str(string_size) + 's')
 
 
 def autocomplete(context, pos):
-    sleep(0.05)  # remove time import
+    # This function is called once when the querry for the possible completions is created
+    # After that sublime automaticly shortens the list based on the prefix
+    # We should generate all (as much as possible) possible suggestions based on the context and the pos
+    # context: the full text written in the opened buffer
+    # pos: the position of the cursor
+    # On the clien side this can't be made async so we should fit in a reasonable response time (~100ms)
+    sleep(0.05)
     print(context)
     print(pos)
+    # the output of this function should be a list of strings that are the suggestions
     return ["Justgiveup", "Yousuck"]
 
 
