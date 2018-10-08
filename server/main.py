@@ -3,12 +3,15 @@ import select
 import queue
 import struct
 
+from time import sleep  # just for testing
+
 PORT = 8008
 string_size = 1024
 serializer = struct.Struct('I ' + str(string_size) + 's')
 
 
 def autocomplete(context, pos):
+    sleep(0.05)  # remove time import
     print(context)
     print(pos)
     return ["Justgiveup", "Yousuck"]
@@ -62,8 +65,8 @@ inputs = [server]
 outputs = []
 message_queues = {}
 
-parts = []
 
+parts = []
 while True:
     try:
         read_feeds, write_feeds, exception_feeds = select.select(inputs, outputs, inputs)
@@ -77,10 +80,11 @@ while True:
                 data = read.get_message(serializer.size)
                 if data:
                     data = serializer.unpack(data)
+                    # print(data[0])
                     if data[0] == 0:
                         pos = data[1].decode().rstrip('\x00')
                         context = ''.join(parts)
-                        suggestions = autocomplete(parts, pos)
+                        suggestions = autocomplete(context, pos)
                         sug_count = len(suggestions)
                         for ind, sug in enumerate(suggestions):
                             message_queues[read].put_nowait(serializer.pack(sug_count - ind, bytes(sug, 'utf-8')))

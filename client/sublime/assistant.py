@@ -13,19 +13,30 @@ serializer = struct.Struct('I ' + str(string_size) + 's')
 class Assistant(sublime_plugin.EventListener):
 
     def __init__(self):
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.connect((socket.gethostname(), PORT))
         self.last_change = 0
         self.list = []
+        self.connect()
+
+    def connect(self):
+        try:
+            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.socket.connect((socket.gethostname(), PORT))
+        except ConnectionRefusedError:
+            print("Kronus connection failed")
+            self.socket = None
+
+    def connecetd(self):
+        return self.socket is not None
 
     def on_query_completions(self, view, prefix, locations):
-        if self.last_change != view.change_count():
+        if self.connecetd() and self.last_change != view.change_count():
             self.last_change = view.change_count()
             # print(view.sel())
             pos = view.sel()[0].begin()
-            parts = textwrap.wrap(view.substr(sublime.Region(0, view.size())), string_size)
+            parts = textwrap.wrap(view.substr(sublime.Region(0, view.size())), string_size, replace_whitespace=False)
             part_count = len(parts)
             for ind, prt in enumerate(parts):
+                # print(view.substr(sublime.Region(0, view.size())))
                 self.socket.send(serializer.pack(part_count - ind, bytes(prt, 'utf-8')))
             self.socket.send(serializer.pack(0, bytes(str(pos), 'utf-8')))
             self.list = []
